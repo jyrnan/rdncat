@@ -13,6 +13,8 @@ class UDPServer {
     let port: NWEndpoint.Port
     let listener: NWListener
     
+    //这里还需要考虑是不是有必要创建Diction来保存UDP的“连接”？
+    //因为有一定的风险会导致这些connection不被释放造成内存泄露
     private var connectionsByID: [Int: UDPServerConnection] = [:]
     
     init(port: UInt16) {
@@ -42,6 +44,8 @@ class UDPServer {
     private func didAccept(nwConnection: NWConnection) {
         let connection = UDPServerConnection(nwConnection: nwConnection)
         self.connectionsByID[connection.id] = connection
+        
+        //设置connection在结束时回调方法，目的是从Sever保存的连接中去掉当前连接
         connection.didStopCallback = { _ in
             self.connectionDidStop(connection)
         }

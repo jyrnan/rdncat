@@ -100,7 +100,7 @@ class UDPServerConnection {
         connection.cancel()
         if let didStopCallback = didStopCallback {
             self.didStopCallback = nil
-            didStopCallback(error)
+            didStopCallback(error) //这个error参数在最终调用时候会无视
         }
     }
 }
