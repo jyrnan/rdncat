@@ -52,7 +52,7 @@ class ServerConnection {
             if let data = data, !data.isEmpty {
                 let message = String(data: data, encoding: .utf8)
                 print("connection \(self.id) did receive, data: \(data as NSData) string: \(message ?? "-") ip: \(self.getHost() ?? "")")
-                self.send(data: data)
+                self.send(data: data) //返回数据
             }
             if isComplete {
                 self.connectionDidEnd()

@@ -5,12 +5,12 @@ if #available(macOS 10.14, *) {
 var isServer = false
 
 func initServer(port: UInt16) {
-    let server = UDPServer(port: port)
+    let server = Server(port: port)
     try! server.start()
 }
 
 func initClient(server: String, port: UInt16) {
-    let client = UDPClient(host: server, port: port)
+    let client = Client(host: server, port: port)
     client.start()
     while(true) {
       var command = readLine(strippingNewline: true)
@@ -26,6 +26,11 @@ func initClient(server: String, port: UInt16) {
       }
       client.connection.send(data: (command?.data(using: .utf8))!)
     }
+}
+    
+guard CommandLine.arguments.count >= 2 else {
+    print("Hello, world!")
+    exit(EXIT_FAILURE)
 }
 
 let firstArgument = CommandLine.arguments[1]
