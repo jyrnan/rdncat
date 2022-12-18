@@ -10,7 +10,25 @@ class Client {
     init(host: String, port: UInt16) {
         self.host = NWEndpoint.Host(host)
         self.port = NWEndpoint.Port(rawValue: port)!
-        let nwConnection = NWConnection(host: self.host, port: self.port, using: .tcp)
+        
+        //自定义TcpOption，增加心跳设置? 看不到发送心跳包
+        let tcpOptions = NWProtocolTCP.Options()
+        tcpOptions.enableKeepalive = true
+        tcpOptions.keepaliveIdle = 2
+        tcpOptions.keepaliveCount = 2
+        tcpOptions.keepaliveInterval = 2
+        
+        let parameters:NWParameters
+//
+        if #available(macOS 10.15, *) {
+//            parameters = NWParameters(tls: NWParameters.tlsOptions(passcode: "8888"),tcp: tcpOptions)
+            parameters = NWParameters(tls: nil,tcp: tcpOptions)
+            
+        } else {
+            parameters = NWParameters(tls: nil, tcp: tcpOptions)
+        }
+        
+        let nwConnection = NWConnection(host: self.host, port: self.port, using: parameters)
         connection = ClientConnection(nwConnection: nwConnection)
     }
     

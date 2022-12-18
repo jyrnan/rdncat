@@ -1,16 +1,19 @@
 import Foundation
+import Network
 
 
-if #available(macOS 10.14, *) {
+if #available(macOS 11.0, *) {
 var isServer = false
 
 func initServer(port: UInt16) {
-    let server = Server(port: port)
-    try! server.start()
+//    let server = UDPServer(port: port)
+//    try! server.start()
+    let server = MulticastClient()
+    server.start()
 }
 
 func initClient(server: String, port: UInt16) {
-    let client = Client(host: server, port: port)
+    let client = UDPClient(host: server, port: port)
     client.start()
     while(true) {
       var command = readLine(strippingNewline: true)
@@ -21,11 +24,19 @@ func initClient(server: String, port: UInt16) {
           command = "\n"
       case "exit":
           client.stop()
+      case "bingo":
+          command = makeLongStr()
+      case "oneTime":
+          client.connection.nwConnection.send(content: "oneTime".data(using: .utf8)!, contentContext: NWConnection.ContentContext.finalMessage, isComplete: true, completion: .contentProcessed{_ in})
       default:
           break
       }
       client.connection.send(data: (command?.data(using: .utf8))!)
     }
+}
+    
+func makeLongStr() -> String {
+    return Array(repeating: "A", count: 20).joined() + "end"
 }
     
 guard CommandLine.arguments.count >= 2 else {

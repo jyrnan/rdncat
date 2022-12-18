@@ -10,7 +10,11 @@ class Server {
     
     init(port: UInt16) {
         self.port = NWEndpoint.Port(rawValue: port)!
-        listener = try! NWListener(using: .tcp, on: self.port)
+        if #available(macOS 10.15, *) {
+            listener = try! NWListener(using: NWParameters.init(passcode: "8888"), on: self.port)
+        } else {
+            listener = try! NWListener(using: .tcp, on: self.port)
+        }
     }
     
     func start() throws {
@@ -23,7 +27,7 @@ class Server {
     func stateDidChange(to newState: NWListener.State) {
         switch newState {
         case .ready:
-          print("Server ready.")
+            print("Server ready.")
         case .failed(let error):
             print("Server failure, error: \(error.localizedDescription)")
             exit(EXIT_FAILURE)
